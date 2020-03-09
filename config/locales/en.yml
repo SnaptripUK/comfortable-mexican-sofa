@@ -29,7 +29,8 @@ en:
         slug: Slug
         full_path: Full path
         parent_id: Parent
-        target_page_id: Redirect to Page
+        target_page_id: Redirect to CMS Page
+        target_path: Redirect to Path
         content: Content
         is_published: Published
       comfy/cms/file:
