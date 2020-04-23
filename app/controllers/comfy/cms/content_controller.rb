@@ -16,7 +16,9 @@ class Comfy::Cms::ContentController < Comfy::Cms::BaseController
 
   def show
     if @cms_page.target_page.present?
-      redirect_to @cms_page.target_page.url(:relative)
+      redirect_to @cms_page.target_page.url(:relative), status: redirect_status
+    elsif @cms_page.redirect_path.present?
+      redirect_to @cms_page.redirect_path, status: redirect_status
     else
       respond_to do |format|
         format.html { render_page }
@@ -30,6 +32,10 @@ class Comfy::Cms::ContentController < Comfy::Cms::BaseController
   end
 
 protected
+
+  def redirect_status
+    @cms_page.redirect_permanent ? 301 : 302
+  end
 
   def render_page(status = 200)
     if @cms_layout = @cms_page.layout
