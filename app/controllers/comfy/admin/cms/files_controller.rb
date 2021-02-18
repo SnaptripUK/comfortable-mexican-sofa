@@ -29,7 +29,7 @@ class Comfy::Admin::Cms::FilesController < Comfy::Admin::Cms::BaseController
     else
       files_scope = @site.files.not_page_file
         .includes(:categories)
-        .where("file_file_name ilike ? or label ilike ?", "%#{params[:file_name]}%", "%#{params[:file_name]}%") #might need gin index later on
+        .where("file_file_name ilike ? or comfy_cms_files.label ilike ?", "%#{params[:file_name]}%", "%#{params[:file_name]}%") #might need gin index later on
         .for_category(params[:category])
         .order('comfy_cms_files.position')
       @files = comfy_paginate(files_scope, 50)
@@ -116,7 +116,7 @@ class Comfy::Admin::Cms::FilesController < Comfy::Admin::Cms::BaseController
     return original_url unless cdn_host
     Addressable::URI.parse(original_url).tap do |url|
       url.site = cdn_host
-    end
+    end.to_s
   end
   helper_method :cdn_url
 
