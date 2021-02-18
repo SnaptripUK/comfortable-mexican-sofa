@@ -1,8 +1,8 @@
 %tr{:id => dom_id(file)}
   %td
     - if file.is_image?
-      - icon_style = "background: url('#{file.file.url(:cms_thumb)}') no-repeat center"
-    .icon{:style => icon_style}
+      - icon_style = "background: url('#{cdn_url(file.file.url(:cms_thumb))}') no-repeat center"
+    .file-icon{:style => icon_style}
       - if !params[:category].present? && @site.files.count > 1
         .dragger
           %span &#8645;
@@ -11,10 +11,20 @@
       = link_to file.label, edit_comfy_admin_cms_site_file_path(@site, file)
       = render :partial => 'comfy/admin/cms/categories/categories', :object => file
     .item-meta
-      %input.file-path{:type => 'text', :value => file.file.url, :readonly => 'readonly'}
+      .li
+        ORIGINAL:
+      .li
+        %input.file-path{:type => 'text', :value => cdn_url(file.file.url), :readonly => 'readonly'}
+          = link_to file.file.url, :title => file.file_file_name, :target => '_blank' do
+            %span.glyphicon.glyphicon-link
+      .li
+        OPTIMISED:
+      - optimised_urls(file).each do |url|
+        .li
+          %input.file-path{:type => 'text', :value => url, :readonly => 'readonly'}
+            = link_to url, :title => file.file_file_name, :target => '_blank' do
+              %span.glyphicon.glyphicon-link
 
-      = link_to file.file.url, :title => file.file_file_name, :target => '_blank' do
-        %span.glyphicon.glyphicon-link
   %td
     .content-type
       = truncate(file.file_content_type)

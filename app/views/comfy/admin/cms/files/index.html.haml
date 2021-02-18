@@ -6,8 +6,15 @@
   .page-header
     = link_to t('.new_link'), new_comfy_admin_cms_site_file_path(@site), :class => 'btn btn-default pull-right', id: 'cms-uploader-browse'
     %h2= t('.title')
+    = form_tag(comfy_admin_cms_site_files_path(@site), :method => :get) do |f|
+      .input-group
+        %input{type: :text, name: 'file_name', value: params[:file_name]}
+      .input-group-btn
+        %button.btn.btn-primary.btn-xs= 'Search File Name/Label'
 
   = render 'comfy/admin/cms/partials/files_before'
+
+
 
   = render :partial => 'comfy/admin/cms/categories/index', :object => 'Comfy::Cms::File'
 

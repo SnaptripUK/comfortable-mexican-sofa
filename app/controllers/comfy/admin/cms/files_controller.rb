@@ -29,6 +29,7 @@ class Comfy::Admin::Cms::FilesController < Comfy::Admin::Cms::BaseController
     else
       files_scope = @site.files.not_page_file
         .includes(:categories)
+        .where("file_file_name ilike ? or label ilike ?", "%#{params[:file_name]}%", "%#{params[:file_name]}%") #might need gin index later on
         .for_category(params[:category])
         .order('comfy_cms_files.position')
       @files = comfy_paginate(files_scope, 50)
@@ -101,7 +102,25 @@ class Comfy::Admin::Cms::FilesController < Comfy::Admin::Cms::BaseController
     head :ok
   end
 
-protected
+  def optimised_urls(file)
+    return [] unless file.file_content_type =~ /jpeg|jpg|png/
+    ext = File.extname(file.file_file_name)
+    ["_d#{ext}", "_m#{ext}", "_d.webp", "_m.webp"].map do |suffix|
+      cdn_url(file.file.url.sub(ext, suffix)).sub("uploads","optim")
+    end
+  end
+  helper_method :optimised_urls
+
+  def cdn_url(original_url)
+    cdn_host = ComfortableMexicanSofa.config.upload_file_options[:cdn_host]
+    return original_url unless cdn_host
+    Addressable::URI.parse(original_url).tap do |url|
+      url.site = cdn_host
+    end
+  end
+  helper_method :cdn_url
+
+  protected
 
   def build_file
     @file = @site.files.new(file_params)
@@ -122,4 +141,5 @@ protected
     end
     params.fetch(:file, {}).permit!
   end
+
 end
